@@ -73,7 +73,11 @@ class App {
   #mapEvent;
   #workouts = [];
   constructor() {
+    //Get user's position
     this._getPosition();
+
+    //Get data from local storage
+    this._getLocalStorage()
 
     form.addEventListener('submit', this._newWorkout.bind(this));
 
@@ -110,6 +114,11 @@ class App {
 
     //handling clicks on map
     this.#map.on('click', this._showForm.bind(this));
+
+    this.#workouts.forEach(work => {
+      this._renderWorkoutMarker(work)
+
+    });
   }
 
   _showForm(mapE) {
@@ -188,6 +197,9 @@ class App {
 
     //hide and clear form and clear input fields
     this._hideForm()
+
+    //set local storage to all workouts
+    this._setLocalStorage()
   }
 
   _renderWorkoutMarker(workout) {
@@ -272,7 +284,29 @@ class App {
     });
 
     //using the public interface
-    workout.click();
+    //workout.click();
+  }
+
+  _setLocalStorage() {
+    localStorage.setItem('workouts', JSON.stringify(this.#workouts));
+  }
+
+  _getLocalStorage(){
+    const data = JSON.parse(localStorage.getItem('workouts'));
+
+    if(!data) return;
+
+    this.#workouts = data;
+    this.#workouts.forEach(work => {
+      this._renderWorkout(work)
+
+    });
+  }
+
+  reset() {
+    //app.reset() in browser console
+    localStorage.removeItem('workouts');
+    location.reload();
   }
 }
 
